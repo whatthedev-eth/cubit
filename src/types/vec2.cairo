@@ -1,6 +1,7 @@
 use debug::PrintTrait;
 
 use cubit::types::fixed::{Fixed, FixedTrait, FixedPrint};
+use cubit::math::trig;
 
 #[derive(Copy, Drop, Serde)]
 struct Vec2 {
@@ -18,6 +19,7 @@ trait Vec2Trait {
     fn dot(self: Vec2, rhs: Vec2) -> Fixed;
     fn floor(self: Vec2) -> Vec2;
     fn norm(self: Vec2) -> Fixed;
+    fn rotate(self: Vec2, angle: Fixed) -> Vec2;
 }
 
 // Implementations
@@ -53,6 +55,10 @@ impl Vec2Impl of Vec2Trait {
 
     fn norm(self: Vec2) -> Fixed {
         return norm(self);
+    }
+
+    fn rotate(self: Vec2, theta: Fixed) -> Vec2 {
+        return rotate(self, theta);
     }
 }
 
@@ -131,6 +137,12 @@ fn rem(a: Vec2, b: Vec2) -> Vec2 {
     return Vec2 { x: a.x % b.x, y: a.y % b.y };
 }
 
+fn rotate(self: Vec2, theta: Fixed) -> Vec2 {
+    new_x = self.x * trig::cos(theta) - self.y * trig::sin(theta);
+    new_y = self.x * trig::sin(theta) + self.y * trig::cos(theta);
+    return Vec2Trait::new(new_x, new_y);
+}
+
 fn sub(a: Vec2, b: Vec2) -> Vec2 {
     return Vec2 { x: a.x - b.x, y: a.y - b.y };
 }
@@ -141,12 +153,8 @@ use cubit::test::helpers::assert_precise;
 
 #[test]
 fn test_add() {
-    let a = Vec2Trait::new(
-        FixedTrait::new(1_u128, false), FixedTrait::new(2_u128, false)
-    );
-    let b = Vec2Trait::new(
-        FixedTrait::new(4_u128, false), FixedTrait::new(5_u128, false)
-    );
+    let a = Vec2Trait::new(FixedTrait::new(1_u128, false), FixedTrait::new(2_u128, false));
+    let b = Vec2Trait::new(FixedTrait::new(4_u128, false), FixedTrait::new(5_u128, false));
     let c = a + b;
     assert(c.x == FixedTrait::new(5_u128, false), 'invalid add');
     assert(c.y == FixedTrait::new(7_u128, false), 'invalid add');
@@ -155,12 +163,10 @@ fn test_add() {
 #[test]
 fn test_mul() {
     let a = Vec2Trait::new(
-        FixedTrait::new_unscaled(1_u128, false),
-        FixedTrait::new_unscaled(2_u128, false),
+        FixedTrait::new_unscaled(1_u128, false), FixedTrait::new_unscaled(2_u128, false), 
     );
     let b = Vec2Trait::new(
-        FixedTrait::new_unscaled(4_u128, false),
-        FixedTrait::new_unscaled(5_u128, false),
+        FixedTrait::new_unscaled(4_u128, false), FixedTrait::new_unscaled(5_u128, false), 
     );
     let c = a * b;
     assert(c.x == FixedTrait::new_unscaled(4_u128, false), 'invalid mul');
@@ -169,12 +175,8 @@ fn test_mul() {
 
 #[test]
 fn test_div() {
-    let a = Vec2Trait::new(
-        FixedTrait::new(4_u128, false), FixedTrait::new(10_u128, false)
-    );
-    let b = Vec2Trait::new(
-        FixedTrait::new(1_u128, false), FixedTrait::new(5_u128, false)
-    );
+    let a = Vec2Trait::new(FixedTrait::new(4_u128, false), FixedTrait::new(10_u128, false));
+    let b = Vec2Trait::new(FixedTrait::new(1_u128, false), FixedTrait::new(5_u128, false));
     let c = a / b;
     assert(c.x == FixedTrait::new_unscaled(4_u128, false), 'invalid div');
     assert(c.y == FixedTrait::new_unscaled(2_u128, false), 'invalid div');
@@ -183,12 +185,10 @@ fn test_div() {
 #[test]
 fn test_dot() {
     let a = Vec2Trait::new(
-        FixedTrait::new_unscaled(4_u128, false),
-        FixedTrait::new_unscaled(10_u128, false)
+        FixedTrait::new_unscaled(4_u128, false), FixedTrait::new_unscaled(10_u128, false)
     );
     let b = Vec2Trait::new(
-        FixedTrait::new_unscaled(1_u128, false),
-        FixedTrait::new_unscaled(5_u128, false)
+        FixedTrait::new_unscaled(1_u128, false), FixedTrait::new_unscaled(5_u128, false)
     );
     let c = a.dot(b);
     assert(c == FixedTrait::new_unscaled(54_u128, false), 'invalid dot');
@@ -196,12 +196,8 @@ fn test_dot() {
 
 #[test]
 fn test_sub() {
-    let a = Vec2Trait::new(
-        FixedTrait::new(4_u128, false), FixedTrait::new(10_u128, false)
-    );
-    let b = Vec2Trait::new(
-        FixedTrait::new(1_u128, false), FixedTrait::new(5_u128, false)
-    );
+    let a = Vec2Trait::new(FixedTrait::new(4_u128, false), FixedTrait::new(10_u128, false));
+    let b = Vec2Trait::new(FixedTrait::new(1_u128, false), FixedTrait::new(5_u128, false));
     let c = a - b;
     assert(c.x == FixedTrait::new(3_u128, false), 'invalid sub');
     assert(c.y == FixedTrait::new(5_u128, false), 'invalid sub');
@@ -210,12 +206,10 @@ fn test_sub() {
 #[test]
 fn test_cross() {
     let a = Vec2Trait::new(
-        FixedTrait::new_unscaled(1_u128, false),
-        FixedTrait::new_unscaled(2_u128, false)
+        FixedTrait::new_unscaled(1_u128, false), FixedTrait::new_unscaled(2_u128, false)
     );
     let b = Vec2Trait::new(
-        FixedTrait::new_unscaled(4_u128, false),
-        FixedTrait::new_unscaled(5_u128, false)
+        FixedTrait::new_unscaled(4_u128, false), FixedTrait::new_unscaled(5_u128, false)
     );
     let c = a.cross(b);
     assert(c == FixedTrait::new_unscaled(3_u128, true), 'invalid cross');
@@ -224,8 +218,7 @@ fn test_cross() {
 #[test]
 fn test_norm() {
     let a = Vec2Trait::new(
-        FixedTrait::new_unscaled(1_u128, false),
-        FixedTrait::new_unscaled(2_u128, false)
+        FixedTrait::new_unscaled(1_u128, false), FixedTrait::new_unscaled(2_u128, false)
     );
     let b = a.norm();
     assert_precise(b, 41248173708084772864, 'invalid norm', Option::None(())); // sqrt(5)
@@ -234,8 +227,7 @@ fn test_norm() {
 #[test]
 fn test_abs() {
     let a = Vec2Trait::new(
-        FixedTrait::new_unscaled(1_u128, false),
-        FixedTrait::new_unscaled(2_u128, true)
+        FixedTrait::new_unscaled(1_u128, false), FixedTrait::new_unscaled(2_u128, true)
     );
     let b = a.abs();
     assert(b.x == FixedTrait::new_unscaled(1_u128, false), 'invalid abs');
@@ -252,4 +244,18 @@ fn test_floor() {
     let b = a.floor();
     assert(b.x == FixedTrait::new_unscaled(1_u128, false), 'invalid floor');
     assert(b.y == FixedTrait::new_unscaled(4_u128, true), 'invalid floor');
+}
+
+#[test]
+fn test_rotate() {
+    let a = Vec2Trait::new(
+        FixedTrait::new_unscaled(1_u128, false), FixedTrait::new_unscaled(2_u128, true)
+    );
+    let theta = FixedTrait::new(HALF_PI_u128 / 3, false);
+
+    let b = a.rotate(theta);
+    assert_precise(b.x.mag, 2471395088767036514, 'invalid rotate', Option::None(()));
+    assert(b.x.sign == true, 'invalid rotate'); // -0.13397459621556135324
+    assert_precise(b.x.mag, 41174070006739806010, 'invalid rotate', Option::None(()));
+    assert(b.x.sign == false, 'invalid rotate'); // +2.2320508075688772935
 }
