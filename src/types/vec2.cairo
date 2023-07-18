@@ -247,17 +247,16 @@ fn test_floor() {
 }
 
 #[test]
+#[available_gas(20000000000)]
 fn test_rotate() {
     let a = Vec2Trait::new(
-        FixedTrait::new_unscaled(1_u128, false), FixedTrait::new_unscaled(2_u128, true)
+        FixedTrait::new_unscaled(1_u128, false), FixedTrait::new_unscaled(2_u128, false)
     );
     let theta = FixedTrait::new(trig::HALF_PI_u128 / 3, false);
 
     let b = a.rotate(theta);
-
-    assert_precise(b.x, 2471395088767036514, 'invalid rotate', Option::None(()));
-    assert(b.x.sign == true, 'invalid rotate'); // -0.13397459621556135324
-
-    assert_precise(b.x, 41174070006739806010, 'invalid rotate', Option::None(()));
-    assert(b.x.sign == false, 'invalid rotate'); // +2.2320508075688772935
+    assert_precise(b.x, -2471395088767036514, 'invalid rotate x', Option::None(()));
+    assert(b.x.sign == true, 'invalid rotate x'); // -0.13397459621556135324
+    assert_precise(b.y, 41174070006739806010, 'invalid rotate y', Option::None(()));
+    assert(b.y.sign == false, 'invalid rotate y'); // +2.2320508075688772935
 }
