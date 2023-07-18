@@ -247,7 +247,7 @@ fn test_floor() {
 }
 
 #[test]
-#[available_gas(20000000000)]
+#[available_gas(20000000)]
 fn test_rotate() {
     let a = Vec2Trait::new(
         FixedTrait::new_unscaled(1_u128, false), FixedTrait::new_unscaled(2_u128, false)
